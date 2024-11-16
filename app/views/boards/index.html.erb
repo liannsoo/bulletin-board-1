@@ -8,6 +8,13 @@
 
 <hr>
 
+<ul>
+  <% @list_of_boards.each do |a_board| %>
+    <li> 
+      <a href="/boards/<%= a_board.id %>"><%a_board.name%><a/>
+    </li>
+</ul>
+
 <div>
   <div>
     <h2>

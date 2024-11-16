@@ -1,8 +1,35 @@
 <div>
   <div>
     <h1>
-      Board #<%= @the_board.id %> details
+      <%= @the_board.name %>
     </h1>
+
+    <hr>
+    <h2>Add a new post </h2>
+    <form action="/insert_post" method="post">
+      <div>
+        <label for="title_field"></label>
+        <input id="title_field" type="text" name="title">
+      </div>
+        <label for="body_field">Body</label>
+        <textarea name="body" id="body_field" cols="30" rows="10"></textarea>
+      </div>
+      <div>
+        <label for="expires_on_field">Expires on</label>
+        <input type="date" id="expires_on_field" name="expires_on_field>
+      </div>
+
+      <div>
+        <label for="board_id">Board ID</label>
+        <input type="text" id="board_id" name="board_id>
+      </div>
+
+      <button>
+        Add post
+      </button>
+
+    </form>
+    </hr>
 
     <div>
       <div>
@@ -43,29 +70,26 @@
   </div>
 </div>
 
-<hr>
+</hr>
 
+<h2>Active posts</h2>
+<% matching_posts = Post.where({ :board_id => @the_board.id}) %>
 
-<div>
-  <div>
-    <h2>
-      Edit board
-    </h2>
+<table>
+  <tr>
+    <td>Title</td>
+    <td>Body</td>
+    <td>Posted on</td>
+    <td>Expires on</td>
+  </tr>
+</table>
 
-    <form action="/modify_board/<%= @the_board.id %>"  method="post" >
-      <div>
-        <label for="name_box">
-          Name
-        </label>
+<% matching_posts.each.do |a_post| %>
+  <tr>
+    <td><%=a_post.title%></td>
+    <td><%=a_post.body%></td>
+    <td><%=a_post.created_at%></td>
+    <td><%=a_post.expires_on%></td>
+  </tr>
 
-        <input type="text" id="name_box" name="query_name" value="<%= @the_board.name %>">
-      </div>
-
-      <button>
-        Update board
-      </button>
-    </form>
-  </div>
-</div>
-
-<hr>
+<% end %>
