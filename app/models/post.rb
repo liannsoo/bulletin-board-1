@@ -11,4 +11,6 @@
 #  board_id   :integer
 #
 class Post < ApplicationRecord
+  belongs_to :board
+  validates :body, presence: true
 end

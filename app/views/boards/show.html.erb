@@ -4,92 +4,80 @@
       <%= @the_board.name %>
     </h1>
 
-    <hr>
-    <h2>Add a new post </h2>
-    <form action="/insert_post" method="post">
-      <div>
-        <label for="title_field"></label>
-        <input id="title_field" type="text" name="title">
-      </div>
-        <label for="body_field">Body</label>
-        <textarea name="body" id="body_field" cols="30" rows="10"></textarea>
-      </div>
-      <div>
-        <label for="expires_on_field">Expires on</label>
-        <input type="date" id="expires_on_field" name="expires_on_field>
-      </div>
+<hr>
+<h2>Add a new post </h2>
+  <form action="/boards/<%= @the_board.id %>/posts" method="post">
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <%= hidden_field_tag 'query_board_id', @the_board.id %>
 
-      <div>
-        <label for="board_id">Board ID</label>
-        <input type="text" id="board_id" name="board_id>
-      </div>
-
-      <button>
-        Add post
-      </button>
-
-    </form>
-    </hr>
-
-    <div>
-      <div>
-        <a href="/boards">
-          Go back
-        </a>
-      </div>
-
-      <div>
-        <a href="/delete_board/<%= @the_board.id %>">
-          Delete board
-        </a>
-      </div>
-    </div>
-
-    <dl>
-      <dt>
-        Name
-      </dt>
-      <dd>
-        <%= @the_board.name %>
-      </dd>
-
-      <dt>
-        Created at
-      </dt>
-      <dd>
-        <%= time_ago_in_words(@the_board.created_at) %> ago
-      </dd>
-
-      <dt>
-        Updated at
-      </dt>
-      <dd>
-        <%= time_ago_in_words(@the_board.updated_at) %> ago
-      </dd>
-    </dl>
+  <div>
+    <label for="title_field">Title</label>
+    <input id="title_field" type="text" name="query_title">
   </div>
-</div>
+  <div>
+    <label for="body_field">Body</label>
+    <textarea name="query_body" id="body_field" rows="3"></textarea>
+  </div>
+  <div>
+    <label for="expires_on_field">Expires on</label>
+    <input type="date" id="expires_on_field" name="query_expires_on">
+  </div>
+  <div>
+      <label for="board_id_field">Board ID</label>
+      <input type="hidden" id="board_id_field" name="query_board_id" value="<%= @the_board.id %>">
+    </div>
+  
+  <button type="submit">
+    Add post
+  </button>
+</form>
 
-</hr>
+<hr>
 
 <h2>Active posts</h2>
-<% matching_posts = Post.where({ :board_id => @the_board.id}) %>
+<% matching_posts = Post.where({ :board_id => @the_board.id}).order({ :expires_on => :asc}) %>
 
 <table border="1">
-  <tr>
-    <td>Title</td>
-    <td>Body</td>
-    <td>Posted on</td>
-    <td>Expires on</td>
-  </tr>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Body</th>
+      <th>Posted on</th>
+      <th>Expires on</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @the_board.posts.where('expires_on >= ?', Date.today).order(expires_on: :asc).each do |post| %>
+      <tr>
+        <td><%= post.title %></td>
+        <td><%= post.body %></td>
+        <td><%= post.created_at.strftime("%b %d, %Y") %></td>
+        <td><%= post.expires_on.strftime("%b %d, %Y") %></td>
+      </tr>
+    <% end %>
+  </tbody>
 </table>
 
-<% matching_posts.each.do |a_post| %>
-  <tr>
-    <td><%=a_post.title%></td>
-    <td><%=a_post.body%></td>
-    <td><%=a_post.created_at%></td>
-    <td><%=a_post.expires_on%></td>
-  </tr>
+<h2>Expired posts</h2>
+<% matching_posts = Post.where({ :board_id => @the_board.id}).order({ :expires_on => :asc}) %>
 
-<% end %>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Body</th>
+      <th>Posted on</th>
+      <th>Expired on</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @the_board.posts.where('expires_on < ?', Date.today).order(expires_on: :desc).each do |post| %>
+      <tr>
+        <td><%= post.title %></td>
+        <td><%= post.body %></td>
+        <td><%= post.created_at.strftime("%b %d, %Y") %></td>
+        <td><%= post.expires_on.strftime("%b %d, %Y") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
